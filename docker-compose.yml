@@ -1,0 +1,42 @@
+services:
+  # mqtt scheduler, reads spot prices, send them to device
+  spot-scheduler:
+    build:
+      context: ./spot-scheduler
+      dockerfile: Dockerfile
+    container_name: spot-scheduler
+    volumes:
+      - ./data:/app/data
+    depends_on:
+      - hivemq
+    environment:
+      - MQTT_HOST=${MQTT_HOST:-hivemq}
+      - MQTT_PORT=${MQTT_PORT:-1883}
+      - PYTHONUNBUFFERED=1
+    command: ["--device-id", "${DEVICE_ID}", "--quants", "${QUANTS}", "${DEBUG}"]
+
+  # for testing purpose, simulating client
+  heater-client:
+    build:
+      context: ./heater-client
+      dockerfile: Dockerfile
+    container_name: heater-client
+    # little tweak to wait for hivemq to start
+    command: ["sh", "-c", "sleep 4 && python mqtt_device_client.py"]
+    environment:
+      - MQTT_HOST=hivemq
+      - MQTT_PORT=1883
+      - PYTHONUNBUFFERED=1
+    depends_on:
+      - hivemq
+  # mqtt server
+  hivemq:
+    image: hivemq/hivemq-ce:latest
+    container_name: hivemq
+    ports:
+      - "1883:1883"
+    volumes:
+      - hivemq-data:/opt/hivemq/data
+
+volumes:
+  hivemq-data: 
