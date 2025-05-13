@@ -5,8 +5,8 @@ services:
       context: ./spot-scheduler
       dockerfile: Dockerfile
     container_name: spot-scheduler
-    volumes:
-      - ./data:/app/data
+    #volumes:
+    #  - ./data:/app/data
     depends_on:
       - hivemq
     environment:

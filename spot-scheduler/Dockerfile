@@ -33,7 +33,7 @@ COPY scheduleGen.py .
 RUN mkdir -p /app/data && chown -R appuser:appuser /app/data && chmod 777 /app/data
 
 # Create volume for persistent database storage
-VOLUME /app/data
+#VOLUME /app/data
 
 # Switch to non-privileged user
 USER appuser
